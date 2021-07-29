@@ -44,7 +44,7 @@ def note_types(note):
     return [i for i in range(len(note)) if note[i] == "1"]
 
 
-def write_note_datas(jsonfile, metadata, measures):
+def write_note_datas(offset, jsonfile, metadata, measures):
     bpm_map = dict([ent.split('=') for ent in metadata["BPMS"].split(',')])
     if len(bpm_map) != 1:
         logging.warning("Can't yet handle a song with multiple BPMs")
@@ -53,7 +53,7 @@ def write_note_datas(jsonfile, metadata, measures):
     bpm = float(bpm_map["0.000"])
     time_per_beat = 60.0 / bpm
 
-    time_now = float(metadata["OFFSET"])
+    time_now = float(metadata["OFFSET"]) + offset
     jsonfile.write("[")
     for measure in measures:
         nc = note_count(measure)
@@ -74,6 +74,7 @@ def write_note_datas(jsonfile, metadata, measures):
 parser = argparse.ArgumentParser(description='Convert a StepMania file into a Champion Island Games Swimming file.')
 parser.add_argument('input', type=file_path, help='the input .sm file')
 parser.add_argument('output', type=new_file_path, help='the output .json file')
+parser.add_argument('--offset', type=float, default=0.000, help='offset of song data in seconds')
 
 
 def main():
@@ -90,7 +91,7 @@ def main():
                 measures = raw_measuredata(raw)
                 output_path = os.path.join(output_dir, f'{difficulty}-{output_name}')
                 with open(output_path, 'w', encoding='utf-8') as jsonfile:
-                    write_note_datas(jsonfile, metadata, measures)
+                    write_note_datas(args.offset, jsonfile, metadata, measures)
             else:
                 logging.warning(f'Unhandleable track with song_type of {song_type}')
 
