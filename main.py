@@ -66,9 +66,10 @@ def write_note_datas(offset, jsonfile, metadata, measures):
                 jsonfile.write(str(time_now * 1000.0))
                 jsonfile.write("},")
             time_now += time_per_note
-    # remove trailing comma
-    jsonfile.seek(jsonfile.tell() - 1, os.SEEK_SET)
-    jsonfile.write("]")
+    # write kill note
+    jsonfile.write("{\"type\":10,\"time\":")
+    jsonfile.write(str(time_now * 1000.0))
+    jsonfile.write("}]")
 
 
 parser = argparse.ArgumentParser(description='Convert a StepMania file into a Champion Island Games Swimming file.')
